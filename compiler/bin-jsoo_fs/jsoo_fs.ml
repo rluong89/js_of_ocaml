@@ -76,8 +76,8 @@ let info =
 let f { files; output_file; include_dirs } =
   let code =
     {|
-//Provides: caml_create_file_extern
-function caml_create_file_extern(name,content){
+//Provides: jsoo_create_file_extern
+function jsoo_create_file_extern(name,content){
   if(joo_global_object.caml_create_file)
     joo_global_object.caml_create_file(name,content);
   else {
@@ -91,11 +91,7 @@ function caml_create_file_extern(name,content){
   let fragments = Linker.parse_string code in
   List.iter fragments ~f:(fun fr -> Linker.load_fragment ~filename:"<dummy>" fr);
   let instr =
-    Pseudo_fs.f
-      ~prim:`caml_create_file_extern
-      ~cmis:StringSet.empty
-      ~files
-      ~paths:include_dirs
+    Pseudo_fs.f ~prim:`create_file_extern ~cmis:StringSet.empty ~files ~paths:include_dirs
   in
   let code = Code.prepend Code.empty instr in
   Filename.gen_file output_file (fun chan ->

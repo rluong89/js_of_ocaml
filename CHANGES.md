@@ -1,6 +1,7 @@
 # dev (2021-??-??) - ??
 ## Features/Changes
 * Compiler: static evaluation of backend_type
+* Compiler: be more consistant dealing with js vs ocaml strings (#984)
 
 ## Bug fixes
 * Compiler: fix sourcemap warning for empty cma
