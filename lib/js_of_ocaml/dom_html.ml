@@ -31,6 +31,15 @@ external decode_html_entities : js_string t -> js_string t = "caml_js_html_entit
 
 class type cssStyleDeclaration =
   object
+    method setProperty :
+      js_string t -> js_string t -> js_string t optdef -> js_string t meth
+
+    method getPropertyValue : js_string t -> js_string t meth
+
+    method getPropertyPriority : js_string t -> js_string t meth
+
+    method removeProperty : js_string t -> js_string t meth
+
     method animation : js_string t prop
 
     method animationDelay : js_string t prop
@@ -619,6 +628,15 @@ and mediaEvent =
     inherit event
   end
 
+and messageEvent =
+  object
+    inherit event
+
+    method data : Unsafe.any opt readonly_prop
+
+    method source : Unsafe.any opt readonly_prop
+  end
+
 and nodeSelector =
   object
     method querySelector : js_string t -> element t opt meth
@@ -880,6 +898,8 @@ module Event = struct
   let loadstart = Dom.Event.make "loadstart"
 
   let lostpointercapture = Dom.Event.make "lostpointercapture"
+
+  let message = Dom.Event.make "message"
 
   let pause = Dom.Event.make "pause"
 
@@ -2815,6 +2835,8 @@ module CoerceTo = struct
   let mouseScrollEvent ev = unsafeCoerceEvent Js.Unsafe.global##._MouseScrollEvent ev
 
   let popStateEvent ev = unsafeCoerceEvent Js.Unsafe.global##._PopStateEvent ev
+
+  let messageEvent ev = unsafeCoerceEvent Js.Unsafe.global##._MessageEvent ev
 end
 
 (****)
@@ -3550,6 +3572,7 @@ let opt_tagged e = Opt.case e (fun () -> None) (fun e -> Some (tagged e))
 type taggedEvent =
   | MouseEvent of mouseEvent t
   | KeyboardEvent of keyboardEvent t
+  | MessageEvent of messageEvent t
   | MousewheelEvent of mousewheelEvent t
   | MouseScrollEvent of mouseScrollEvent t
   | PopStateEvent of popStateEvent t
@@ -3570,7 +3593,11 @@ let taggedEvent (ev : #event Js.t) =
                 (fun () ->
                   Js.Opt.case
                     (CoerceTo.popStateEvent ev)
-                    (fun () -> OtherEvent (ev :> event t))
+                    (fun () ->
+                      Js.Opt.case
+                        (CoerceTo.messageEvent ev)
+                        (fun () -> OtherEvent (ev :> event t))
+                        (fun ev -> MessageEvent ev))
                     (fun ev -> PopStateEvent ev))
                 (fun ev -> MouseScrollEvent ev))
             (fun ev -> MousewheelEvent ev))

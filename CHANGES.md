@@ -2,6 +2,10 @@
 ## Features/Changes
 * Compiler: static evaluation of backend_type
 * Compiler: be more consistant dealing with js vs ocaml strings (#984)
+* Compiler: speedup emitting js files.
+* Lib: add messageEvent to Dom_html
+* Lib: add PerformanceObserver API
+* Lib: add CSSStyleDeclaration.{setProperty, getPropertyValue, getPropertyPriority, removeProperty}
 
 ## Bug fixes
 * Compiler: fix sourcemap warning for empty cma
